@@ -1,0 +1,286 @@
+# Display the first and last name of each actor in a  single column in upper case letters.
+ Name the column `Actor Name`.
+ 
+ select lower(concat(first_name, '_ ',last_name)) as actor_name
+ from actor;
+ 
+ # You need to find the ID number, first name, and last name of  an actor, of whom you know only the first name, "Joe."
+ 
+  select actor_id,first_name,last_name from actor
+ where first_name='joe';
+
+#.  	Find all actors whose last name contain the letters `GEN`
+
+      select last_name from actor where last_name like '%GEN%';
+      
+# 
+# Find all actors whose last names contain the letters `LI`.
+
+ select actor_id,first_name,last_name from actor
+ where last_name like '%LI%'
+ order by last_name;
+ 
+ # Using `IN`, display the `country_id` and `country` columns of the following countries  Afghanistan, Bangladesh, and China
+
+ select * from country
+ select country,country_id from country
+ where country in('Afghanistan','Bangladesh','China')
+ 
+ #List the last names of actors, as well as how many actors  have that last name
+
+ select last_name,count(last_name) as actors_lst_name
+ from actor
+ group by last_name;
+ 
+ #List last names of actors and the number of actors who have that last name, but only for names that are shared by at least two actors.
+
+select last_name,count(last_name) as actor_list from actor
+group by last_name 
+having actor_list>=2;
+
+#   find the actor firstName replace to jhons?
+
+select * from actor
+update actor set first_name='jhons' where actor_id=1;
+select * from actor
+
+# rename actors tables
+
+alter table acted rename to actor
+update actor set first_name ='PENELOPE' where actor_id=1
+select * from actor
+
+# find the  city and country_id is 60 betwwen theme
+
+select * from city
+where city='acua' and country_id='60'
+
+# find the city whose country_id is betwwen 20 to 100 theme
+
+ select * from city
+ where country_id between 20 and 30;
+ 
+ 
+    # Use `JOIN` to display the first and last names,    as well as the address, of each staff member. Use the tables `staff` and `address`:
+ 
+select * from staff   
+select first_name,last_name,s.address_id from staff s
+inner join address a on 
+s.address_id=a.address_id
+group by s.address_id
+
+# Use `JOIN` to display the total amount rung up by each staff  member in August of 2005. Use tables `staff` and `payment`.
+ 
+
+select s.staff_id,count(*) as each_staff,sum(p.amount),p.payment_date
+ from staff s
+inner join payment p on
+p.staff_id=s.staff_id and payment_date like '%2005-08%'
+#where (p.payment_date) like '%2005-08%'
+group by s.staff_id
+
+# List each film and the number of actors who are listed for thatfilm.  Use tables `film_actor` and `film`. Use inner join
+
+select f.title,f.film_id,fa.actor_id from film_actor fa
+inner join film f on 
+f.film_id=fa.film_id
+group by f.film_id;
+
+# How many copies of the film `Hunchback Impossible`  exist in the inventory system?
+ exist in the inventory system?
+ # using subquerry
+
+ select title, (
+ select count(*) from inventory
+ where film.film_id=inventory.film_id) as no_copies from film
+ where title='Hunchback Impossible'
+
+# jois
+
+ select f.title,f.film_id from inventory i
+ inner join film f on f.film_id=i.film_id
+ where title='Hunchback Impossible'
+ 
+ # Using the tables `payment` and `customer` and the `JOIN` command, list the total paid by each customer. 
+### 		List the customers alphabetically by last name:
+  
+
+select c.customer_id,first_name,last_name,sum(p.amount) as total_paid
+from customer c
+inner join payment p on 
+p.customer_id=c.customer_id
+group by c.customer_id;
+
+# 	The music of Queen and Kris Kristofferson have seen an unlikely resurgence. As an unintended consequence, 
+### 		films starting with the letters `K` and `Q` have also soared in popularity. 
+### VVI		Use subqueries to display the titles of movies starting with the letters `K` and `Q` whose language is English. 
+ 
+ select * from language;
+select title from film
+where language_id in(select language_id from language
+where name='english')and
+ (title like 'K%') or (title like 'Q%');
+ 
+ #Use subqueries to display all actors who appear in the film  `Alone Trip`.
+
+ select first_name,last_name from actor
+ where actor_id in(select actor_id from film_actor
+ where film_id in(select film_id from film
+ where title='Alone Trip'));
+ 
+ # You want to run an email marketing campaign in Canada, for which you  will need the names and email addresses of all Canadian customers. 
+ 
+select c.first_name,last_name,email,ct.country from customer c
+inner join country ct on 
+c.address_id=ct.country_id
+where ct.country='Canada';
+select * from address
+
+select * from customer where address_id in(
+select address_id from address where city_id in(
+select city_id from city where country_id in(
+select country_id from country where country='canada')))
+
+# Sales have been lagging among young families, and you wish 
+to target all family movies for a promotion.  	Identify all movies categorized as famiy films.
+	
+select fc.category_id,f.film_id,title,c.name from film_category fc
+inner join film f on
+fc.film_id=f.film_id
+inner join category c on
+c.category_id=fc.category_id
+where c.name='family'
+      
+## Subquerry
+
+ select title,description from film
+ where film_id in(select film_id from film_category
+ where category_id in(select category_id from category
+ where name='family'))
+ 
+ # Display the most frequently rented movies in descending order.
+
+ select count(inventory_id) from rental
+ where inventory_id in(select inventory_id from inventory
+ where film_id in(select film_id from film 
+ where title in(select title from film_text )))
+ group by inventory_id
+ 
+ select f.title,count(r.inventory_id),i.film_id from film f
+ inner join inventory i on
+ i.film_id=f.film_id
+ inner join rental r on
+ r.inventory_id=i.inventory_id
+ group by (r.inventory_id)
+ 
+ # Write a query to display how much business, in dollars,  each store brought in.
+
+  select s.store_id,a.district,ct.city,c.country from store s
+  inner join address a on
+  a.address_id=s.address_id
+  inner join city ct on
+  ct.city_id=a.city_id
+  inner join country c on
+  c.country_id=ct.country_id
+  
+  List the top five genres in gross revenue in descending order. (**Hint**: you may need to use the following tables: category,
+###      	film_category, inventory, payment, and rental.)
+
+select c.name as genres,sum(p.amount) as gross_revenue from category c
+inner join film_category fc on
+fc.category_id=c.category_id
+inner join inventory i on 
+i.film_id=fc.film_id 
+inner join rental r on
+r.inventory_id=i.inventory_id
+inner join payment p on
+p.rental_id=r.rental_id
+group by c.name
+order by gross_revenue limit 5;
+# 3dec 2022#..
+select * from actor where last_name regexp '^pe';
+select * from actor where first_name regexp 'ck$'
+select * from actor where last_name regexp '^[^ro]';
+select * from actor where last_name regexp '^[^aeiou]'
+select * from actor where last_name regexp '[ro$]'
+select * from actor where last_name regexp '[^AE]$'
+select * from actor where last_name regexp '^[^n..k$]'
+select * from actor where last_name regexp 'nny*'
+select * from actor where first_name regexp 'nny*' -- end with nny...
+select * from actor where last_name regexp 'lob+'; --loloolool
+select * from actor where last_name regexp '^deg+';
+
+#  fetch count city_id from each country
+
+select count(city_id),district from address 
+group by district;
+# fethch all country table with city& district have done.
+
+select a.district,c.city,co.country from address a
+inner join city c on
+c.city_id=a.city_id
+inner join country co on
+co.country_id=c.country_id;
+
+# get the count of cities in each country
+
+select a.district,c.city,co.country from address a
+inner join city c on
+c.city_id=a.city_id
+inner join country co on
+co.country_id=c.country_id
+group by co.country;
+
+select * from address where city_id in(
+select city_id from city c inner join country co 
+on c.country_id=co.country_id
+where co.country='argentina');
+
+# fetch all payment each customer id
+
+select customer_id,sum(amount) as total_pay from payment
+group by customer_id
+ # fetch all stfID each recored
+ select sum(amount) as t_pay ,staff_id from payment
+ group by staff_id
+ having t_pay >150
+ order by t_pay desc;
+ 
+ # temporary_table
+
+ create temporary  table movies 
+ (
+ select * from film )
+select * from movies
+drop table movies;
+ # subquerry 
+ select * from payment where customer_id in(
+ select customer_id from customer 
+ where concat(first_name,last_name)='marysmith')
+ 
+ create temporary table filmcategories
+ select f.title,
+ ( select c.name from film_category fc
+ inner join category c on c.category_id=fc.category_id
+ where f.film_id=fc.film_id) as category
+ from film f
+ select * from filmcategories;
+ 
+ select count(title) t_title,category from filmcategories
+ group by category
+ having category regexp'^ho'
+# Find the indian customer who have contain pakistan customer rented
+
+select *,'INDIA' as country from 
+Customer C 
+INNER JOIN ADDRESS A On C.Address_ID=A.Address_ID
+WHERE A.CITY_ID IN (select City_ID from City C INNER JOIN Country CO
+ON C.country_id=Co.Country_ID where CO.COuntry='INDIA');
+
+create temporary table table1 (
+select first_name,last_name , 'INDIA' as country from 
+Customer C 
+INNER JOIN ADDRESS A On C.Address_ID=A.Address_ID
+WHERE A.CITY_ID IN (select City_ID from City C INNER JOIN Country CO
+ON C.country_id=Co.Country_ID where CO.COuntry='INDIA'));
+select * from table1;
